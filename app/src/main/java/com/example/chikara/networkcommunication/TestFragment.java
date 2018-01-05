@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import org.json.JSONObject;
 
@@ -20,6 +22,7 @@ public class TestFragment extends Fragment {
 
     Call<String> mGetResultCallObj;
     String param = "1";
+    ProgressBar progressBar;
 
     @Nullable
     @Override
@@ -30,21 +33,28 @@ public class TestFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        progressBar = getView().findViewById(R.id.progressBar);
         serverCommunication();
     }
 
     private void serverCommunication() {
-        mGetResultCallObj = RetrofitClient.getAPI(getActivity()).getResult("1");
+        mGetResultCallObj = RetrofitClient.getAPI(getActivity()).getResult(param);
         mGetResultCallObj.enqueue(new RetrofitConnectionCallBack(getActivity(),
                 new RetrofitConnectionCallBack.ConnectionListener() {
                     @Override
                     public void onSuccess(JSONObject respObj) {
+                        progressBar.setVisibility(View.GONE);
                         Log.e("respObj", "" + respObj);
+                        ((TextView) getView().findViewById(R.id.respTV))
+                                .setText("SERVER-RESPONSE" + "\n" + respObj.toString());
                     }
 
                     @Override
                     public void onError(String errorMessage) {
+                        progressBar.setVisibility(View.GONE);
                         Log.e("errorMessage", "" + errorMessage);
+                        ((TextView) getView().findViewById(R.id.respTV))
+                                .setText("SERVER-ERROR" + "\n" + errorMessage);
                     }
                 }));
     }

@@ -3,9 +3,12 @@ package com.example.chikara.networkcommunication;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import org.json.JSONObject;
 
 import retrofit2.Call;
 
@@ -31,17 +34,17 @@ public class TestFragment extends Fragment {
     }
 
     private void serverCommunication() {
-        mGetResultCallObj = new RetrofitClient().getAPI(getActivity()).getResult("1");
+        mGetResultCallObj = RetrofitClient.getAPI(getActivity()).getResult("1");
         mGetResultCallObj.enqueue(new RetrofitConnectionCallBack(getActivity(),
                 new RetrofitConnectionCallBack.ConnectionListener() {
                     @Override
-                    public void onSuccess(String resp) {
-
+                    public void onSuccess(JSONObject respObj) {
+                        Log.e("respObj", "" + respObj);
                     }
 
                     @Override
                     public void onError(String errorMessage) {
-
+                        Log.e("errorMessage", "" + errorMessage);
                     }
                 }));
     }

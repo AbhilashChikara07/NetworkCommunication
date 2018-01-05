@@ -5,6 +5,8 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import java.net.UnknownHostException;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -24,22 +26,27 @@ public class RetrofitConnectionCallBack implements Callback<String> {
 
     @Override
     public void onResponse(Call<String> call, Response<String> response) {
-        Log.e("response", "" + response);
-        try{
-            JSONObject jsonObject = new JSONObject(response.body().toString());
-            Log.e("jsonObject", "" + jsonObject);
-        }catch (Exception e){
-
+        try {
+            listener.onSuccess(new JSONObject(response.body()));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void onFailure(Call<String> call, Throwable t) {
-        Log.e("response-t", "" + t);
+        if (t instanceof UnknownHostException) {
+            listener.onError("No Internet");
+        } else if (t instanceof RetrofitExceptionClass) {
+            t.printStackTrace();
+            listener.onError(t.getMessage());
+        } else {
+            listener.onError("Some thing went wrong");
+        }
     }
 
     interface ConnectionListener {
-        void onSuccess(String resp);
+        void onSuccess(JSONObject respObj);
 
         void onError(String errorMessage);
     }
